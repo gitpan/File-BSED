@@ -1,0 +1,99 @@
+#!/usr/local/bin/perl
+use strict;
+use warnings;
+use Getopt::LL  qw( getoptions );
+use File::BSED  qw( bsed );
+use English     qw(-no_match_vars);
+use File::Basename;
+
+my $program_name = basename($PROGRAM_NAME);
+
+my $minmatch;
+my $maxmatch;
+my $do_replace = 0;
+my $matches;
+my $options = getoptions({
+    '-m'          => sub {
+        my ($getopt, $node) = @_;
+        my $next_arg = $getopt->get_next_arg($node);
+
+        die "Missing argument to -m"
+            if not $next_arg;
+
+        die "bad min/max match count. must be numbers."
+            if $next_arg !~ m/^\d+(-\d+)?$/xms;
+
+        ($minmatch, $maxmatch) = split m/\-/xms, $next_arg;
+        if (!defined $maxmatch) {
+            $maxmatch = $minmatch;
+            $minmatch = undef;
+        }
+
+        if (defined $minmatch && $minmatch <= 0) {
+            die "minmatch must be greater than 0\n";
+        }
+
+        if ($maxmatch < $minmatch) {
+            die "maxmatch must not be less than minmatch\n";
+        }
+    },
+        
+});
+
+$minmatch ||=  1;
+$maxmatch ||= -1;
+
+if (! scalar @ARGV) {
+    usage($program_name);
+}
+
+my ($pat, $infile, $outfile) = @ARGV;
+
+my ($search, $replace) = split m/=/xms, $pat;
+if (defined $replace) {
+
+    $matches = bsed({
+        search      => $search,
+        replace     => $replace,
+        
+        infile      => $infile,
+        outfile     => $outfile,
+
+        minmatch    => $minmatch,
+        maxmatch    => $maxmatch,
+    });
+}
+else {
+    
+    $matches = binary_file_matches($search, $infile);
+}
+
+if ($matches == -1) {
+    die sprintf("ERROR: %s\n", File::BSED->errtostr());
+}
+elsif ($matches == 0) {
+    die "File [$infile] does not match [$search]\n";
+}
+else {
+    print "Matched $matches time(s)\n";
+}
+
+sub usage {
+    my ($program_name) = @_;
+    
+    print {*STDERR} <<"EOF"
+
+This is $program_name v$File::BSED::VERSION
+
+Usage: $program_name [-m [minmatch-]maxmatch] search=replace infile outfile
+       $program_name [-m [minmatch-]maxmatch] search infile
+
+Wildcard bytes () are supported in both the search and replace strings
+Both search and replace strings must be multiples of whole bytes,
+Only the characters 0-9, a-f, A-F and ? are acceptible
+
+EOF
+;
+
+    exit;
+}

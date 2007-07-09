@@ -1,0 +1,10 @@
+bsed - the original program,
+by Dave Dykstra <dwd@bell-labs.com>
+
+with patch from 0xfeedface.
+
+bsedlib - library version of bsed,
+and File::Bsed, the perl-binding.
+by Ask Solem <ask@0x61736b.net>
+
+
