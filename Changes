@@ -1,6 +1,10 @@
-Revision history for Perl extension XSExample.
+Revision history for Perl extension File-BSED.
 
-0.01  Sun May 27 03:04:06 2007
-	- original version; created by h2xs 1.23 with options
-		-A -n XSExample
+0.2  Tue Jun 10 17:33:53 2007
+    - Removed t/XSExample.t as this was a file left over from h2xs,
+      and made our tests fail.
+    - Minor documentation changes.
+
+0.1  Mon Jun 09 16:04:06 2007
+	- Initial version.
 

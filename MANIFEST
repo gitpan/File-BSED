@@ -1,8 +1,12 @@
 AUTHORS
 bin/plbsed
+BSED.bs
+BSED.c
+BSED.o
 BSED.xs
 bsedlib.c
 bsedlib.h
+bsedlib.o
 Changes
 COPYING
 inc/Module-Install-0.67/Changes
@@ -118,4 +122,3 @@ t/perlcriticrc
 t/pod-coverage.t
 t/pod.t
 t/testbinary
-t/XSExample.t

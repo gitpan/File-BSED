@@ -1,9 +1,9 @@
-# $Id: BSED.pm,v 1.1.1.1 2007/07/09 22:04:02 ask Exp $
+# $Id: BSED.pm,v 1.3 2007/07/10 15:32:43 ask Exp $
 # $Source: /opt/CVS/File-BSED/lib/File/BSED.pm,v $
 # $Author: ask $
 # $HeadURL$
-# $Revision: 1.1.1.1 $
-# $Date: 2007/07/09 22:04:02 $
+# $Revision: 1.3 $
+# $Date: 2007/07/10 15:32:43 $
 package File::BSED;
 use strict;
 use warnings;
@@ -13,7 +13,7 @@ use Exporter;
 use Carp;
 
 BEGIN {
-    $VERSION   = 0.1;
+    $VERSION   = 0.2;
     @EXPORT_OK = qw(
         bsed
         binary_file_matches
@@ -78,7 +78,7 @@ File::BSED - Search/Replace in Binary Files.
 
 =head1 VERSION
 
-This document describes File::BSED version 0.1
+This document describes File::BSED version 0.2
 
 =head1 SYNOPSIS
 
@@ -161,6 +161,8 @@ Example:
     }
     print "Replaced $number_of_matches time(s).\n";
 
+=head2 ERROR HANDLING
+
 =head3 C<binary_file_matches($search_pattern, $input_file)>
 
 Return the number of times C<$search_pattern> is found in binary file.
@@ -173,14 +175,14 @@ Example:
 
 =head3 C<errtostr>
 
-If an error has occured with either C<bsed> or C<binary_file_matches>
-(they return -1 on error). This function returns a string describing what
-happened.
+This function returns a string describing what happened.
+if an error has occured with either C<bsed> or C<binary_file_matches>
+(they return -1 on error). 
 
 =head3 C<errno>
 
-If an error has occured with either C<bsed> or C<binary_file_matches>
-(they return -1 on error). This function returns the error number.
+This function returns the error number if an error has occured with
+either C<bsed> or C<binary_file_matches> (they return -1 on error). 
 
 Use C<errtostr> instead.
 
@@ -194,8 +196,6 @@ This module requires no configuration file or environment variables.
 
 
 =over 4
-
-=item * L<version>
 
 =item * A working C compiler.
 
