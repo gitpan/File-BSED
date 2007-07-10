@@ -1,9 +1,9 @@
-# $Id: BSED.pm,v 1.3 2007/07/10 15:32:43 ask Exp $
+# $Id: BSED.pm,v 1.6 2007/07/10 19:00:01 ask Exp $
 # $Source: /opt/CVS/File-BSED/lib/File/BSED.pm,v $
 # $Author: ask $
 # $HeadURL$
-# $Revision: 1.3 $
-# $Date: 2007/07/10 15:32:43 $
+# $Revision: 1.6 $
+# $Date: 2007/07/10 19:00:01 $
 package File::BSED;
 use strict;
 use warnings;
@@ -13,7 +13,7 @@ use Exporter;
 use Carp;
 
 BEGIN {
-    $VERSION   = 0.2;
+    $VERSION   = 0.3;
     @EXPORT_OK = qw(
         bsed
         binary_file_matches
@@ -78,7 +78,7 @@ File::BSED - Search/Replace in Binary Files.
 
 =head1 VERSION
 
-This document describes File::BSED version 0.2
+This document describes File::BSED version 0.3
 
 =head1 SYNOPSIS
 
@@ -108,7 +108,22 @@ This is a perl-binding to C<bsedlib>, which is a library version of C<bsed>,
 the binary stream editor.
 
 C<bsed> lets you search and replace binary data in binary files by using hex
-values in text strings as search patterns.
+values in text strings as search patterns. You can also use wildcard matches
+with C<??>, which will match any wide byte.
+
+These are all valid search strings:
+
+    search => "0xffc300193ab2f63a";
+    search => "0xff??00??3ab2f??a";
+    search => "FF??00??3AB2F??A";
+
+while these are not:
+
+    search => "the quick brown fox"; # only hex, no text. you would have to
+                                     # convert the text to hex first.
+    search => "0xff?c33ab3?accc";    # no nybbles only wide bytes. (?? not ?).
+
+
 
 =head1 SUBROUTINES/METHODS
 
@@ -138,6 +153,14 @@ The filename of the file to search in.
 =item outfile
 
 The filename of the file to save changes to.
+
+=item minmatch
+
+Need at least C<$minmatch> matches before any work.
+
+=item maxmatch
+
+Stop after C<$maxmatch> matches.
 
 =back
 
@@ -234,7 +257,7 @@ C<File::BSED> and C<bsedlib>
 by Ask Solem, C<< ask@0x61736b.net >>.
 
 C<bsed> - the original program,
-by Dave Dykstra C<< dwd@bell-labs.com >>.
+by Dave Dykstra C<< dwdbsed@drdykstra.us >>.
 with patch from C<0xfeedface>.
 
 =head1 LICENSE AND COPYRIGHT

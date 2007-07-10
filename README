@@ -26,7 +26,7 @@ in full is in the file LICENSE.GPL
 The bsedlib code bundled with this library is a hacked version
 of bsed to make the code reusable to work as a library. 
 bsedlib was hacked together by the author of File::BSED, but the 
-original author of bsed is Dave Dykstra <dwd@bell-labs.com>, you can
+original author of bsed is Dave Dykstra <dwdbsed@drdykstra.us>, you can
 find more information on bsed here: http://www.bell-labs.com/wwexptools/bsed/
 
 bsedlib and bsed is released under a GPL-style license. See the COPYING

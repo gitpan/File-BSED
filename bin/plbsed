@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 use Getopt::LL  qw( getoptions );
-use File::BSED  qw( bsed );
+use File::BSED  qw( bsed binary_file_matches );
 use English     qw(-no_match_vars);
 use File::Basename;
 
@@ -88,7 +88,7 @@ This is $program_name v$File::BSED::VERSION
 Usage: $program_name [-m [minmatch-]maxmatch] search=replace infile outfile
        $program_name [-m [minmatch-]maxmatch] search infile
 
-Wildcard bytes () are supported in both the search and replace strings
+Wildcard bytes (??) are supported in both the search and replace strings
 Both search and replace strings must be multiples of whole bytes,
 Only the characters 0-9, a-f, A-F and ? are acceptible
 
