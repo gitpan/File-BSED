@@ -1,4 +1,13 @@
 /*
+* $Id: bsedlib.h,v 1.2 2007/07/13 09:56:26 ask Exp $
+* $Source: /opt/CVS/File-BSED/bsedlib.h,v $
+* $Author: ask $
+* $HeadURL$
+* $Revision: 1.2 $
+* $Date: 2007/07/13 09:56:26 $
+*/
+
+/*
  * bsed - binary stream editor.  Written Feb 1987 by David W. Dykstra
  * Copyright (C) 1987-2002 by Dave Dykstra and Lucent Technologies
  *
@@ -29,3 +38,11 @@ const char* isb_errtostr(int);
 #define ISB_ENULL_REPLACE        0x4
 #define ISB_EMISSING_INPUT       0x5
 #define ISB_EMISSING_OUTPUT      0x6
+
+/*
+# Local Variables:
+#   indent-level: 4
+#   fill-column: 78
+# End:
+# vim: expandtab tabstop=4 shiftwidth=4 shiftround
+*/

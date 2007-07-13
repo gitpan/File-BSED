@@ -1,9 +1,9 @@
-# $Id: BSED.pm,v 1.6 2007/07/10 19:00:01 ask Exp $
+# $Id: BSED.pm,v 1.9 2007/07/13 15:42:39 ask Exp $
 # $Source: /opt/CVS/File-BSED/lib/File/BSED.pm,v $
 # $Author: ask $
 # $HeadURL$
-# $Revision: 1.6 $
-# $Date: 2007/07/10 19:00:01 $
+# $Revision: 1.9 $
+# $Date: 2007/07/13 15:42:39 $
 package File::BSED;
 use strict;
 use warnings;
@@ -13,7 +13,7 @@ use Exporter;
 use Carp;
 
 BEGIN {
-    $VERSION   = 0.3;
+    $VERSION   = 0.4;
     @EXPORT_OK = qw(
         bsed
         binary_file_matches
@@ -78,7 +78,7 @@ File::BSED - Search/Replace in Binary Files.
 
 =head1 VERSION
 
-This document describes File::BSED version 0.3
+This document describes File::BSED version 0.4
 
 =head1 SYNOPSIS
 
@@ -165,7 +165,7 @@ Stop after C<$maxmatch> matches.
 =back
 
 C<bsed> returns the number of times the search string was found
-in the file, or C<-1> if an error occured.
+in the file, or C<-1> if an error occurred.
 When an error occurs the error number can be found with C<errno>
 and you can get a description of the error with C<errtostr>.
 
@@ -301,5 +301,9 @@ POSSIBILITY OF SUCH DAMAGES.
 
 =cut
 
-# Local variables:
-# vim: ts=4
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 78
+# End:
+# vim: expandtab tabstop=4 shiftwidth=4 shiftround

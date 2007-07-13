@@ -1,16 +1,20 @@
 Revision history for Perl extension File-BSED.
 
-0.3  Tue Jun 10 18:43:22 2007
+0.4  Fri Jul 13 17:33:09 2007
+    - bsedlib.c: Forgot to close files and flush buffers.
+    - bsedlib.c: Global variables removed.
+
+0.3  Tue Jul 10 18:43:22 2007
     - bin/plbsed: We didn't import binary_file_matches
     - Documented wildcard matching and minmatch+maxmatch.
     - Changed Dave Dykstra's email from dwd@bell-labs.com to
       dwdbsed@drdykstra.us.
 
-0.2  Tue Jun 10 17:33:53 2007
+0.2  Tue Jul 10 17:33:53 2007
     - Removed t/XSExample.t as this was a file left over from h2xs,
       and made our tests fail.
     - Minor documentation changes.
 
-0.1  Mon Jun 09 16:04:06 2007
+0.1  Mon Jul 09 16:04:06 2007
 	- Initial version.
 

@@ -1,3 +1,12 @@
+/*
+* $Id: bsedlib.c,v 1.4 2007/07/13 15:42:38 ask Exp $
+* $Source: /opt/CVS/File-BSED/bsedlib.c,v $
+* $Author: ask $
+* $HeadURL$
+* $Revision: 1.4 $
+* $Date: 2007/07/13 15:42:38 $
+*/
+
 /* bsedlib - Library version of binary stream editor.
    written 2007 by Ask Solem <ask@0x61736b.net>
 
@@ -29,15 +38,10 @@
 #include <unistd.h>
 #include "bsedlib.h"
 
-#define REPLACESIZE	128	/* maximum replacement string size */
+#define REPLACESIZE	1024	/* maximum replacement string size */
 
 #define CTXTSIZE	5	/* size of left and right context  */
-unsigned char ltxt[CTXTSIZE+1],rtxt[CTXTSIZE+1];
-int ltlen = 0;
-int rtlen = 0;
 
-int stack[REPLACESIZE+CTXTSIZE+1]; /* saved character stack */
-int topstack = 0;
 int isb_errno = 0;
 
 #define mygetc()	((topstack == 0) ? getc(ifile) : stack[--topstack])
@@ -57,6 +61,9 @@ int isb_errno = 0;
 				putc(c,ofile); \
 			} while(0);
 #endif
+
+//void fmyputc(int *stack, int topstack, register int c) {
+
 
 const char* isb_errtostr(int isb_errno_val) {
     const char *retval;
@@ -99,14 +106,22 @@ minmatch, int maxmatch, int opt_noreplace) {
     unsigned char *replace;
     int slen, rlen  = 0;
     int match       = 0;
+    unsigned char ltxt[CTXTSIZE+1],rtxt[CTXTSIZE+1];
+    int ltlen = 0;
+    int rtlen = 0;
+    int stack[REPLACESIZE+CTXTSIZE+1]; /* saved character stack */
+    int topstack = 0;
+
     search  = NULL;
     replace = NULL;
+
+    isb_errno = 0;
 
     unsigned char sbuf[REPLACESIZE+1]; /* search string buffer */
     unsigned char rbuf[REPLACESIZE+1]; /* replace string buffer */
 
     FILE *ifile,*ofile;		/* input and output files */
-    
+    ifile = NULL; 
     ofile = NULL;    /* the output FILE struct */
     
     /* check the search string */
@@ -180,7 +195,6 @@ minmatch, int maxmatch, int opt_noreplace) {
 	    }
     }
 
-
     cnt = 0;
     s = search;
     do
@@ -191,7 +205,7 @@ minmatch, int maxmatch, int opt_noreplace) {
 	{
 	    register long savcnt;
 	    register unsigned char *end;
-	    static int savbuf[REPLACESIZE];
+	    int savbuf[REPLACESIZE];
 	    int savlen;
 
 
@@ -261,6 +275,15 @@ minmatch, int maxmatch, int opt_noreplace) {
 	    myputc(c);
 
     } while (c != EOF);
+
+    /* flush the buffer */
+    fflush(ofile);
+
+    /* close files */
+    fclose(ifile);
+    if (ofilenm != NULL) {
+        fclose(ofile);
+    }
 
     match -= (minmatch - 1);
 
@@ -371,6 +394,7 @@ int convert(register unsigned char *s, register unsigned char *o)
 	    return(-1);
     }
     *p = '\0';
+    
     return(p - o);
 }
 
@@ -419,3 +443,13 @@ unsigned char* dump(unsigned char *str,register int len)
     *p++ = '\0';
     return(&buf[0]);
 }
+
+
+/*
+# Local Variables:
+#   mode: cperl
+#   indent-level: 4
+#   fill-column: 78
+# End:
+# vim: expandtab tabstop=4 shiftwidth=4 shiftround
+*/

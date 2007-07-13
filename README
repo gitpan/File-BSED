@@ -1,33 +1,179 @@
-This is the README file for File::BSED, a module for search/replacing
-binary data in binary files using the bsedlib library.
+NAME
+    File::BSED - Search/Replace in Binary Files.
 
-Please type "perldoc File::BSED" after installation to see the
-module usage information.
+VERSION
+    This document describes File::BSED version 0.4
 
-* Installation
+SYNOPSIS
+        use File::BSED qw(bsed binary_files_matches);
 
-File::BSED uses the standard perl module install process:
+        # search/replace
+        my $matches = bsed({
+            search  => 'ff3cea3f0013',
+            replace => 'b801000000c3',
+            infile  => '/bin/ls',
+            outfile => '/tmp/ls.patched'
+        });
+        if ($matches == -1) {
+            my $error_string = File::BSED->errtostr();
+            die "Error: $error_string\n";
+        }
+        print "Replaced $matches time(s)\n";
 
-    cpansign -v         # optional; see SIGNATURE for details
-    perl Makefile.PL
-    make                # or 'nmake' on Win32
-    make test
-    make install
+        # search
+        my $matches = binary_files_matches('ff3cea3f0013', '/bin/ls');
+        print "Matched $matches time(s)\n";
 
-* Copyright
+DESCRIPTION
+    This is a perl-binding to "bsedlib", which is a library version of
+    "bsed", the binary stream editor.
 
-Copyright 2007 by Ask Solem <ask@0x61736b.net>
+    "bsed" lets you search and replace binary data in binary files by using
+    hex values in text strings as search patterns. You can also use wildcard
+    matches with "??", which will match any wide byte.
 
-See the file AUTHORS for more information.
+    These are all valid search strings:
 
-This software is released under the GPLv3 license, the license
-in full is in the file LICENSE.GPL
+        search => "0xffc300193ab2f63a";
+        search => "0xff??00??3ab2f??a";
+        search => "FF??00??3AB2F??A";
 
-The bsedlib code bundled with this library is a hacked version
-of bsed to make the code reusable to work as a library. 
-bsedlib was hacked together by the author of File::BSED, but the 
-original author of bsed is Dave Dykstra <dwdbsed@drdykstra.us>, you can
-find more information on bsed here: http://www.bell-labs.com/wwexptools/bsed/
+    while these are not:
 
-bsedlib and bsed is released under a GPL-style license. See the COPYING
-file for details.
+        search => "the quick brown fox"; # only hex, no text. you would have to
+                                         # convert the text to hex first.
+        search => "0xff?c33ab3?accc";    # no nybbles only wide bytes. (?? not ?).
+
+SUBROUTINES/METHODS
+  CLASS METHODS
+   "bsed(\%arguments)"
+    Search and replace in a binary file. Valid arguments are:
+
+    search
+        The pattern to search for. Must be a string with hex digits.
+
+    replace
+        What to replace with. Must be a string with hex digits. (Probably a
+        very good idea that it is the same length as the search pattern).
+
+    infile
+        The filename of the file to search in.
+
+    outfile
+        The filename of the file to save changes to.
+
+    minmatch
+        Need at least $minmatch matches before any work.
+
+    maxmatch
+        Stop after $maxmatch matches.
+
+    "bsed" returns the number of times the search string was found in the
+    file, or -1 if an error occurred. When an error occurs the error number
+    can be found with "errno" and you can get a description of the error
+    with "errtostr".
+
+    Example:
+
+        my $number_of_matches = bsed({
+            search  => '0xff',
+            replace => '0x00',
+            
+        infile  => '/bin/ls',
+            outfile => '/bin/ls.patched',
+        });
+
+        if ($number_of_matches = -1) {
+            die sprintf("ERROR: %s\n", File::BSED->errtostr());
+        }
+        print "Replaced $number_of_matches time(s).\n";
+
+  ERROR HANDLING
+   "binary_file_matches($search_pattern, $input_file)"
+    Return the number of times $search_pattern is found in binary file.
+    Search pattern must be a string of hex digits.
+
+    Example:
+
+        my $number_of_matches = binary_file_matches('0xfeedface', '/bin/ls');
+        print "Matched $number_of_matches time(s)\n";
+
+   "errtostr"
+    This function returns a string describing what happened. if an error has
+    occured with either "bsed" or "binary_file_matches" (they return -1 on
+    error).
+
+   "errno"
+    This function returns the error number if an error has occured with
+    either "bsed" or "binary_file_matches" (they return -1 on error).
+
+    Use "errtostr" instead.
+
+DIAGNOSTICS
+CONFIGURATION AND ENVIRONMENT
+    This module requires no configuration file or environment variables.
+
+DEPENDENCIES
+    *   A working C compiler.
+
+INCOMPATIBILITIES
+    None known.
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests to
+    "bug-file-bsed@rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org>.
+
+SEE ALSO
+    "bsed"
+        The "bsedlib" is a fork of bsed, you can get more information on
+        "bsed" here:
+
+        <http://www.bell-labs.com/wwexptools/bsed/>
+
+AUTHOR
+    "File::BSED" and "bsedlib" by Ask Solem, "ask@0x61736b.net".
+
+    "bsed" - the original program, by Dave Dykstra "dwdbsed@drdykstra.us".
+    with patch from 0xfeedface.
+
+LICENSE AND COPYRIGHT
+    Copyright (c), 2007 Ask Solem "ask@0x61736b.net".
+
+    All rights reserved>.
+
+    File::BSED is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License (GPL) as published by
+    the Free Software Foundation (http://www.fsf.org/); either version 2 of
+    the License, or (at your option) any later version.
+
+    You should have received copies of the GPL and AGPL as part of the
+    File::BSED distribution, in the file named "LICENSE.GPL". respectively;
+    if not, see http://www.gnu.org/licenses or write to the Free Software
+    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
+    USA.
+
+DISCLAIMER OF WARRANTY
+    BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+    FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+    OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+    PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+    EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+    ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+    YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+    NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+    IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+    WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+    REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE
+    TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR
+    CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
+    SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+    RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+    FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+    SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+    DAMAGES.
+

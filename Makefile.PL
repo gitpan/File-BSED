@@ -27,7 +27,7 @@ requires('File::Temp'             => 0);
 build_requires('Test::More'             => 0);
 build_requires('ExtUtils::ParseXS'      => 0);
 
-install_script 'bin/plbsed';
+install_script 'examples/plbsed';
 
 # Write Makefile
 can_cc() or die "This module requires a C compiler";
