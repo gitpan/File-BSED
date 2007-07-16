@@ -1,14 +1,14 @@
 ---
 name: File-BSED
-version: 0.4
+version: 0.5
 author:
   - 'Ask Solem <ASKSH@cpan.org>'
 abstract: Search/Replace in Binary Files.
-license: gpl
+license: perl
 resources:
   HomePage: http://search.cpan.org/dist/File-BSED/
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=File-BSED
-  license: http://www.opensource.org/licenses/gpl-license.php
+  license: http://dev.perl.org/licenses/
 requires:
   ExtUtils::ParseXS: 0
   Getopt::LL: 0
@@ -18,7 +18,7 @@ dynamic_config: 1
 provides:
   File::BSED:
     file: lib/File/BSED.pm
-    version: 0.4
+    version: 0.5
 generated_by: Module::Build version 0.2808
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.2.html

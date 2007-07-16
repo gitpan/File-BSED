@@ -1,41 +1,34 @@
-# $Id: BSED.pm,v 1.9 2007/07/13 15:42:39 ask Exp $
+# $Id: BSED.pm,v 1.14 2007/07/16 18:10:33 ask Exp $
 # $Source: /opt/CVS/File-BSED/lib/File/BSED.pm,v $
 # $Author: ask $
 # $HeadURL$
-# $Revision: 1.9 $
-# $Date: 2007/07/13 15:42:39 $
+# $Revision: 1.14 $
+# $Date: 2007/07/16 18:10:33 $
 package File::BSED;
 use strict;
 use warnings;
-use 5.008008;
-use vars qw($VERSION @EXPORT_OK @ISA);
+use 5.006006;
 use Exporter;
-use Carp;
+use Carp qw(croak);
+use vars qw($VERSION @EXPORT_OK @ISA);
 
-BEGIN {
-    $VERSION   = 0.4;
-    @EXPORT_OK = qw(
-        bsed
-        binary_file_matches
-    );
-    @ISA = qw( Exporter ); ## no critic
+$VERSION   = 0.5;
 
-    local $@; ## no critic;
-    eval { ## no critic
-        require XSLoader;
-        XSLoader::load(__PACKAGE__, $VERSION);
-        1;
-    }
-    or do {
-        require DynaLoader;
-        push @ISA, 'DynaLoader'; ## no critic
-        __PACKAGE__->bootstrap($VERSION);
-    };
-}
+@EXPORT_OK = qw(
+    gbsed
+    binary_search_replace
+    binary_file_matches
+    string_to_hexstring
+);
 
-sub bsed {
+use base qw(Exporter);
+
+require XSLoader;
+XSLoader::load(__PACKAGE__, $VERSION);
+
+sub binary_search_replace {
     my ($args_ref) = @_;
-    croak 'Argument to File::BSED::bsed must be hash reference'
+    croak 'Argument to File::BSED::binary_search_replace must be hash reference'
         if !ref $args_ref || ref $args_ref ne 'HASH';
 
     my $search  = $args_ref->{search};
@@ -47,23 +40,41 @@ sub bsed {
     my $max     = $args_ref->{maxmatch} || -1;
 
 
-    return _bsed($search, $replace, $infile, $outfile, $min, $max);
+    return _gbsed($search, $replace, $infile, $outfile, $min, $max);
 }
 
 sub binary_file_matches {
     my ($search, $infile) = @_;
 
+    return 0 if not $search;
+
+    croak 'Missing filename argument to binary_file_matches()'
+        if not defined $infile;
+
     return _binary_file_matches($search, $infile);
 }
 
-sub errtostr {
-    my $errno = errno();
+sub string_to_hexstring {
+    my ($string) = @_;
+    return if not $string;
 
-    return _errtostr($errno);
+    return _string_to_hexstring($string);
+}
+
+sub gbsed {
+    goto &binary_search_replace;
+}
+
+sub errtostr {
+    goto &_errtostr;
 }
 
 sub errno {
-    return _isb_errno();
+    goto &_gbsed_errno;
+}
+
+sub warnings {
+    goto &_warnings;
 }
 
 1;
@@ -78,14 +89,14 @@ File::BSED - Search/Replace in Binary Files.
 
 =head1 VERSION
 
-This document describes File::BSED version 0.4
+This document describes File::BSED version 0.5
 
 =head1 SYNOPSIS
 
-    use File::BSED qw(bsed binary_files_matches);
+    use File::BSED qw(binary_search_replace binary_file_matches);
 
     # search/replace
-    my $matches = bsed({
+    my $matches = binary_search_replace({
         search  => 'ff3cea3f0013',
         replace => 'b801000000c3',
         infile  => '/bin/ls',
@@ -98,16 +109,26 @@ This document describes File::BSED version 0.4
     print "Replaced $matches time(s)\n";
 
     # search
-    my $matches = binary_files_matches('ff3cea3f0013', '/bin/ls');
+    my $matches = binary_file_matches('ff3cea3f0013', '/bin/ls');
     print "Matched $matches time(s)\n";
+
+    # replace 'gnu' to 'bsd'
+    my $hex_gnu = File::BSED::string_to_hexstring('gnu');
+    my $hex_bsd = File::BSED::string_to_hexstring('bsd');
+    my $matches = binary_search_replace({
+        search  => $hex_gnu,
+        replace => $hex_bsd,
+        infile  => '/bin/ls',
+        outfile => 'ls.bsd',
+    });
+    # [...]
 
 
 =head1 DESCRIPTION
 
-This is a perl-binding to C<bsedlib>, which is a library version of C<bsed>,
-the binary stream editor.
+This is a perl-binding to C<libgbsed>, a binary stream editor.
 
-C<bsed> lets you search and replace binary data in binary files by using hex
+C<gbsed> lets you search and replace binary data in binary files by using hex
 values in text strings as search patterns. You can also use wildcard matches
 with C<??>, which will match any wide byte.
 
@@ -130,7 +151,7 @@ while these are not:
 
 =head2 CLASS METHODS 
 
-=head3 C<bsed(\%arguments)>
+=head3 C<binary_search_replace(\%arguments)>
 
 Search and replace in a binary file.
 Valid arguments are:
@@ -171,7 +192,7 @@ and you can get a description of the error with C<errtostr>.
 
 Example:
 
-    my $number_of_matches = bsed({
+    my $number_of_matches = binary_search_replace({
         search  => '0xff',
         replace => '0x00',
         
@@ -184,7 +205,9 @@ Example:
     }
     print "Replaced $number_of_matches time(s).\n";
 
-=head2 ERROR HANDLING
+=head3 C<gbsed(\%arguments)>
+
+Alias to C<binary_search_replace> for backward compatibility.
 
 =head3 C<binary_file_matches($search_pattern, $input_file)>
 
@@ -196,19 +219,38 @@ Example:
     my $number_of_matches = binary_file_matches('0xfeedface', '/bin/ls');
     print "Matched $number_of_matches time(s)\n";
 
+=head3 C<string_to_hexstring($text)>
+
+Convert text to a string of ASCII hex values.
+
+=head2 ERROR HANDLING
+
 =head3 C<errtostr>
 
 This function returns a string describing what happened.
-if an error has occured with either C<bsed> or C<binary_file_matches>
+if an error has occurred with either C<binary_search_matches> or C<binary_file_matches>
 (they return -1 on error). 
 
 =head3 C<errno>
 
-This function returns the error number if an error has occured with
-either C<bsed> or C<binary_file_matches> (they return -1 on error). 
+This function returns the error number if an error has occurred with
+either C<binary_search_replace> or C<binary_file_matches> (they return -1 on error). 
 
 Use C<errtostr> instead.
 
+=head2 WARNINGS
+
+=head3 C<warnings()>
+
+Returns an array ref to any warnings raised.
+
+Example:
+
+    my @warnings = @{ File::BSED::warnings() };
+    for my $warning (@warnings) {
+        warn "Warning: $warning\n";
+    }
+    
 =head1 DIAGNOSTICS
 
 =head1 CONFIGURATION AND ENVIRONMENT
@@ -223,7 +265,6 @@ This module requires no configuration file or environment variables.
 =item * A working C compiler.
 
 =back
-
 
 
 =head1 INCOMPATIBILITIES
@@ -242,41 +283,35 @@ L<http://rt.cpan.org>.
 
 =over 4
 
-=item C<bsed>
-
-The C<bsedlib> is a fork of bsed, you can get more information
-on C<bsed> here:
-
-L<http://www.bell-labs.com/wwexptools/bsed/>
+=item * L<plbsed>
 
 =back
 
 =head1 AUTHOR
 
-C<File::BSED> and C<bsedlib>
 by Ask Solem, C<< ask@0x61736b.net >>.
 
-C<bsed> - the original program,
-by Dave Dykstra C<< dwdbsed@drdykstra.us >>.
-with patch from C<0xfeedface>.
+=head1 ACKNOWLEDGEMENTS
+
+Dave Dykstra C<< dwdbsed@drdykstra.us >>.
+for C<bsed> the original program,
+
+I<0xfeedface>
+for the wildcards patch.
 
 =head1 LICENSE AND COPYRIGHT
 
 Copyright (c), 2007 Ask Solem C<< ask@0x61736b.net >>.
 
-All rights reserved>.
+=head2 SEE
 
-File::BSED is free software; you can redistribute it and/or modify it under the
-terms of the GNU General Public License (GPL) as published by the Free Software
-Foundation (http://www.fsf.org/); either version 2 of the License, or (at your
-option) any later version.
+L<perlartistic> L<perlgpl>
 
-You should have received copies of the GPL and AGPL as part of the File::BSED
-distribution, in the file named "LICENSE.GPL".
-respectively; if not, see http://www.gnu.org/licenses or write to the Free
-Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-02110-1301 USA.
+All rights reserved.
 
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.
 
 =head1 DISCLAIMER OF WARRANTY
 

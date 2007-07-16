@@ -1,8 +1,11 @@
 Revision history for Perl extension File-BSED.
 
+0.5  Sun Jul 15 22:38:45 2007
+    - uses new version of libgbsed.
+
 0.4  Fri Jul 13 17:33:09 2007
-    - bsedlib.c: Forgot to close files and flush buffers.
-    - bsedlib.c: Global variables removed.
+    - libgbsed.c: Forgot to close files and flush buffers.
+    - libgbsed.c: Global variables removed.
 
 0.3  Tue Jul 10 18:43:22 2007
     - bin/plbsed: We didn't import binary_file_matches

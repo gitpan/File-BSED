@@ -2,13 +2,13 @@ NAME
     File::BSED - Search/Replace in Binary Files.
 
 VERSION
-    This document describes File::BSED version 0.4
+    This document describes File::BSED version 0.5
 
 SYNOPSIS
-        use File::BSED qw(bsed binary_files_matches);
+        use File::BSED qw(binary_search_replace binary_file_matches);
 
         # search/replace
-        my $matches = bsed({
+        my $matches = binary_search_replace({
             search  => 'ff3cea3f0013',
             replace => 'b801000000c3',
             infile  => '/bin/ls',
@@ -21,14 +21,13 @@ SYNOPSIS
         print "Replaced $matches time(s)\n";
 
         # search
-        my $matches = binary_files_matches('ff3cea3f0013', '/bin/ls');
+        my $matches = binary_file_matches('ff3cea3f0013', '/bin/ls');
         print "Matched $matches time(s)\n";
 
 DESCRIPTION
-    This is a perl-binding to "bsedlib", which is a library version of
-    "bsed", the binary stream editor.
+    This is a perl-binding to "libgbsed", a binary stream editor.
 
-    "bsed" lets you search and replace binary data in binary files by using
+    "gbsed" lets you search and replace binary data in binary files by using
     hex values in text strings as search patterns. You can also use wildcard
     matches with "??", which will match any wide byte.
 
@@ -46,7 +45,7 @@ DESCRIPTION
 
 SUBROUTINES/METHODS
   CLASS METHODS
-   "bsed(\%arguments)"
+   "binary_search_replace(\%arguments)"
     Search and replace in a binary file. Valid arguments are:
 
     search
@@ -75,7 +74,7 @@ SUBROUTINES/METHODS
 
     Example:
 
-        my $number_of_matches = bsed({
+        my $number_of_matches = binary_search_replace({
             search  => '0xff',
             replace => '0x00',
             
@@ -88,7 +87,9 @@ SUBROUTINES/METHODS
         }
         print "Replaced $number_of_matches time(s).\n";
 
-  ERROR HANDLING
+   "gbsed(\%arguments)"
+    Alias to "binary_search_replace" for backward compatibility.
+
    "binary_file_matches($search_pattern, $input_file)"
     Return the number of times $search_pattern is found in binary file.
     Search pattern must be a string of hex digits.
@@ -98,14 +99,16 @@ SUBROUTINES/METHODS
         my $number_of_matches = binary_file_matches('0xfeedface', '/bin/ls');
         print "Matched $number_of_matches time(s)\n";
 
+  ERROR HANDLING
    "errtostr"
     This function returns a string describing what happened. if an error has
-    occured with either "bsed" or "binary_file_matches" (they return -1 on
-    error).
+    occurred with either "binary_search_matches" or "binary_file_matches"
+    (they return -1 on error).
 
    "errno"
-    This function returns the error number if an error has occured with
-    either "bsed" or "binary_file_matches" (they return -1 on error).
+    This function returns the error number if an error has occurred with
+    either "binary_search_replace" or "binary_file_matches" (they return -1
+    on error).
 
     Use "errtostr" instead.
 
@@ -127,33 +130,27 @@ BUGS AND LIMITATIONS
     <http://rt.cpan.org>.
 
 SEE ALSO
-    "bsed"
-        The "bsedlib" is a fork of bsed, you can get more information on
-        "bsed" here:
-
-        <http://www.bell-labs.com/wwexptools/bsed/>
+    *   plbsed
 
 AUTHOR
-    "File::BSED" and "bsedlib" by Ask Solem, "ask@0x61736b.net".
+    by Ask Solem, "ask@0x61736b.net".
 
-    "bsed" - the original program, by Dave Dykstra "dwdbsed@drdykstra.us".
-    with patch from 0xfeedface.
+ACKNOWLEDGEMENTS
+    Dave Dykstra "dwdbsed@drdykstra.us". for "bsed" the original program,
+
+    *0xfeedface* for the wildcards patch.
 
 LICENSE AND COPYRIGHT
     Copyright (c), 2007 Ask Solem "ask@0x61736b.net".
 
-    All rights reserved>.
+  SEE
+    perlartistic perlgpl
 
-    File::BSED is free software; you can redistribute it and/or modify it
-    under the terms of the GNU General Public License (GPL) as published by
-    the Free Software Foundation (http://www.fsf.org/); either version 2 of
-    the License, or (at your option) any later version.
+    All rights reserved.
 
-    You should have received copies of the GPL and AGPL as part of the
-    File::BSED distribution, in the file named "LICENSE.GPL". respectively;
-    if not, see http://www.gnu.org/licenses or write to the Free Software
-    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
-    USA.
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.6 or, at
+    your option, any later version of Perl 5 you may have available.
 
 DISCLAIMER OF WARRANTY
     BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
