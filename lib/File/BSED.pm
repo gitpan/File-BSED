@@ -1,9 +1,9 @@
-# $Id: BSED.pm,v 1.14 2007/07/16 18:10:33 ask Exp $
+# $Id: BSED.pm,v 1.15 2007/07/17 15:26:37 ask Exp $
 # $Source: /opt/CVS/File-BSED/lib/File/BSED.pm,v $
 # $Author: ask $
 # $HeadURL$
-# $Revision: 1.14 $
-# $Date: 2007/07/16 18:10:33 $
+# $Revision: 1.15 $
+# $Date: 2007/07/17 15:26:37 $
 package File::BSED;
 use strict;
 use warnings;
@@ -12,7 +12,7 @@ use Exporter;
 use Carp qw(croak);
 use vars qw($VERSION @EXPORT_OK @ISA);
 
-$VERSION   = 0.5;
+$VERSION   = 0.6;
 
 @EXPORT_OK = qw(
     gbsed
@@ -66,15 +66,15 @@ sub gbsed {
 }
 
 sub errtostr {
-    goto &_errtostr;
+    return _errtostr(_gbsed_errno());
 }
 
 sub errno {
-    goto &_gbsed_errno;
+    return _gbsed_errno();
 }
 
 sub warnings {
-    goto &_warnings;
+    return _warnings();
 }
 
 1;
@@ -89,7 +89,7 @@ File::BSED - Search/Replace in Binary Files.
 
 =head1 VERSION
 
-This document describes File::BSED version 0.5
+This document describes File::BSED version 0.6
 
 =head1 SYNOPSIS
 

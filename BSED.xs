@@ -19,12 +19,12 @@ extern int gbsed_warn_index;
 MODULE = File::BSED		PACKAGE = File::BSED
 PROTOTYPES: DISABLE
 
-# $Id: BSED.xs,v 1.8 2007/07/16 18:10:30 ask Exp $
+# $Id: BSED.xs,v 1.9 2007/07/17 15:26:35 ask Exp $
 # $Source: /opt/CVS/File-BSED/BSED.xs,v $
 # $Author: ask $
 # $HeadURL$
-# $Revision: 1.8 $
-# $Date: 2007/07/16 18:10:30 $
+# $Revision: 1.9 $
+# $Date: 2007/07/17 15:26:35 $
 
 #
 #
@@ -201,23 +201,6 @@ _errtostr(gbsed_errno_val)
     OUTPUT:
     RETVAL
 
-SV *
-_hexstr2bin(in)
-    unsigned char *in;
-
-    CODE:
-        unsigned char out[1024];
-        _gbsed_hexstr2bin(in, out);
-        if (out == NULL) {
-            RETVAL = &PL_sv_undef;
-        }
-        else {
-            RETVAL = newSVpvn((char *)out, (STRLEN)strlen((char *)out));
-        }
-
-    OUTPUT:
-        RETVAL
-    
 #
 # Local Variables:
 #   indent-level: 4

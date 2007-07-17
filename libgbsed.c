@@ -19,12 +19,12 @@
 */
 
 /*
-* $Id: libgbsed.c,v 1.3 2007/07/16 18:10:30 ask Exp $
+* $Id: libgbsed.c,v 1.4 2007/07/17 15:26:35 ask Exp $
 * $Source: /opt/CVS/File-BSED/libgbsed.c,v $
 * $Author: ask $
 * $HeadURL$
-* $Revision: 1.3 $
-* $Date: 2007/07/16 18:10:30 $
+* $Revision: 1.4 $
+* $Date: 2007/07/17 15:26:35 $
 */
 
 #ifdef HAVE_CONFIG_H
@@ -37,6 +37,8 @@
 #include <unistd.h>
 #include <errno.h>
 #include <assert.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 #include "libgbsed.h"
 
@@ -45,6 +47,8 @@
 #endif /* VERSION */
 
 #define GBSED_MAX_WARNINGS 128
+#define VRWMODE     (S_IRUSR|S_IWUSR)
+#define UN_FILEMODE ((VRWMODE)|(VRWMODE>>3)|(VRWMODE>>6))
 
 /* stores the error code */
 int  gbsed_errno       = 0;
@@ -104,6 +108,9 @@ gbsed_errtostr(int gbsed_errno_val)
             retval = gbsed_file_error;
             break;
         case GBSED_EOPEN_INFILE:
+            retval = gbsed_file_error;
+            break;
+        case GBSED_ENOSTAT_FDES:
             retval = gbsed_file_error;
             break;
         case GBSED_EMINMAX_BALANCE:
@@ -205,6 +212,7 @@ gbsed_binary_search_replace(struct gbsed_arguments *arg)
 
     /* Open output file */
     if (outfilename != NULL) {
+        mode_t preserve_exec;
     
         if (strcmp(outfilename, "-") == 0) {
             outfile = stdout;
@@ -219,6 +227,14 @@ gbsed_binary_search_replace(struct gbsed_arguments *arg)
                 return GBSED_ERROR;
             }
         }
+
+        /* preserve the exec bits from input file. */
+        if ((preserve_exec = _gbsed_preserve_execbit(infile)) != 0)
+            fchmod(fileno(outfile), preserve_exec);
+        else 
+            return GBSED_ERROR;
+         
+        
     }
 
     
@@ -606,6 +622,54 @@ _gbsed_hexstr2bin(register UCHAR *in, int *len_buf)
 
 }
 
+mode_t
+_gbsed_preserve_execbit(FILE *file)
+{
+    struct stat *filestat;
+    mode_t       cur_umask      = 00;
+    mode_t       filemode       = 00;
+    mode_t       retmode        = 00;
+    int          statret        = -1;
+
+    /* get the permissions for the file */
+    filestat = _gbsed_alloc(filestat, 1, struct stat);
+    if (filestat == NULL) {
+        gbsed_errno = GBSED_ENOMEM;
+        goto CLEANUP;
+    }
+    statret = fstat(fileno(file), filestat);
+    if (statret == -1) {
+        gbsed_errno = GBSED_ENOSTAT_FDES;
+        snprintf(gbsed_file_error, sizeof(gbsed_file_error),
+            "Could not stat open file descriptor: %s",
+            strerror(errno)
+        );
+        goto CLEANUP;
+    }
+    filemode = filestat->st_mode;
+
+    /* get current umask. */
+    cur_umask = umask(S_IRWXG|S_IRWXO);
+    /* have to set the umask back to what it was before */
+    umask(cur_umask);
+
+    /* apply the umask to the mode we return */
+    retmode = UN_FILEMODE & ~cur_umask;
+
+    /* apply exec bits from the files mode to the mode we return */
+    if (filemode  &  S_IXUSR)
+        retmode   |= S_IXUSR;
+    if (filemode  &  S_IXGRP)
+        retmode   |= S_IXGRP;
+    if (filemode  &  S_IXOTH)
+        retmode   |= S_IXOTH;
+
+    CLEANUP:
+    _gbsed_safefree(filestat);
+
+    return retmode;
+}
+
 /*
 
 =pod
@@ -679,7 +743,7 @@ while these are not:
 
 =head1 FUNCTIONS
 
-=head2 C<gbsed_binary_search_replace(struct bsed_arguments *)>
+=head2 C<gbsed_binary_search_replace(struct gbsed_arguments *)>
 
 =head3 ARGUMENTS
 
@@ -688,13 +752,13 @@ The members of the argument struct is as follows:
 
 =over 4
 
-=item C<unsigned char *searchin>
+=item C<char *search>
 
 What to search for. This must be a string with hex values or the wildcard
 character sequence C<??>, which will match any byte. The string
 can start with C<0x>, but this is optional.
 
-=item C<unsigned char *replacein>
+=item C<char *replace>
 
 What to replace with. Must also be a string with hex values,
 but no wildcards allowed. It must also be of the same length
@@ -704,11 +768,11 @@ it will be rendered useless as address offsets will be shifted and
 relocation tables and internal address references will point to the
 wrong place).
 
-=item C<unsigned char *ifilenm>
+=item C<char *infilename>
 
 The file name of the file to search in.
 
-=item C<unsigned char *ofilenm>
+=item C<char *outfilename>
 
 The file name to save the modified binary as.
 

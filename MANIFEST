@@ -3,6 +3,7 @@ BSED.xs
 Changes
 config.h
 COPYING
+doc/gbsed.pod
 doc/libgbsed.pod
 examples/example.c
 examples/example.pl

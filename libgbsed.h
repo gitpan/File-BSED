@@ -19,12 +19,12 @@
 */
 
 /*
-* $Id: libgbsed.h,v 1.3 2007/07/16 18:10:30 ask Exp $
+* $Id: libgbsed.h,v 1.4 2007/07/17 15:26:35 ask Exp $
 * $Source: /opt/CVS/File-BSED/libgbsed.h,v $
 * $Author: ask $
 * $HeadURL$
-* $Revision: 1.3 $
-* $Date: 2007/07/16 18:10:30 $
+* $Revision: 1.4 $
+* $Date: 2007/07/17 15:26:35 $
 */
 
 #ifdef HAVE_CONFIG_H
@@ -52,6 +52,7 @@
 #define GBSED_EOPEN_OUTFILE        0xa
 #define GBSED_ENOMEM               0xb
 #define GBSED_EMINMAX_BALANCE      0xc
+#define GBSED_ENOSTAT_FDES          0xd
 
 #define GBSED_WBALANCE             0x1
 
@@ -106,37 +107,39 @@ void *
 _gbsed_alloczero(size_t,  size_t);
 
 
-#define _gbsed_alloc(pointer, add, type)    \
-    (type *)_gbsed_alloczero(add, sizeof(type))
-
-#define _gbsed_realloc(pointer, add, type)  \
-    (type *)realloc(pointer, add*sizeof(type))
-
-#define _gbsed_safefree(pointer)            \
-    free(pointer)
 
 
 #ifdef PERL_MALLOC
 #  include <EXTERN.h>
 #  include <perl.h>
-#  undef  _gbsed_alloc(pointer, add, type)
 #  define _gbsed_alloc(pointer, add, type)   \
     (type *)Newxz(pointer, add, type)
-#  undef  _gbsed_realloc(pointer, add, type) \
+#  define  _gbsed_realloc(pointer, add, type) \
     (type *)Renew(pointer, add, type)
-#  undef  _gbsed_safefree(pointer)
 #  define _gbsed_safefree(pointer)           \
     Safefree(pointer)
+#else /* not PERL_MALLOC */
+#define _gbsed_alloc(pointer, add, type)    \
+    (type *)_gbsed_alloczero(add, sizeof(type))
+#define _gbsed_realloc(pointer, add, type)  \
+    (type *)realloc(pointer, add*sizeof(type))
+#define _gbsed_safefree(pointer)            \
+    free(pointer)
 #endif /* PERL_MALLOC */
 
 /*           Private functions       */
 
 #ifdef LIBGBSED_PRIVATE
-    char *
-    _gbsed_remove_0x_from_str(char *);
 
-    UCHAR *
-    _gbsed_hexstr2bin(register UCHAR *, int *);
+char *
+_gbsed_remove_0x_from_str(char *);
+
+UCHAR *
+_gbsed_hexstr2bin(register UCHAR *, int *);
+
+mode_t
+_gbsed_preserve_execbit(FILE *file);
+
 #else  /* not lIBGBSED_PRIVATE */
 #  define LIBGBSED_PRIVATE 0
 #endif /*     LIBGBSED_PRIVATE */

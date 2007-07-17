@@ -2,7 +2,7 @@ NAME
     File::BSED - Search/Replace in Binary Files.
 
 VERSION
-    This document describes File::BSED version 0.5
+    This document describes File::BSED version 0.6
 
 SYNOPSIS
         use File::BSED qw(binary_search_replace binary_file_matches);
@@ -23,6 +23,17 @@ SYNOPSIS
         # search
         my $matches = binary_file_matches('ff3cea3f0013', '/bin/ls');
         print "Matched $matches time(s)\n";
+
+        # replace 'gnu' to 'bsd'
+        my $hex_gnu = File::BSED::string_to_hexstring('gnu');
+        my $hex_bsd = File::BSED::string_to_hexstring('bsd');
+        my $matches = binary_search_replace({
+            search  => $hex_gnu,
+            replace => $hex_bsd,
+            infile  => '/bin/ls',
+            outfile => 'ls.bsd',
+        });
+        # [...]
 
 DESCRIPTION
     This is a perl-binding to "libgbsed", a binary stream editor.
@@ -99,6 +110,9 @@ SUBROUTINES/METHODS
         my $number_of_matches = binary_file_matches('0xfeedface', '/bin/ls');
         print "Matched $number_of_matches time(s)\n";
 
+   "string_to_hexstring($text)"
+    Convert text to a string of ASCII hex values.
+
   ERROR HANDLING
    "errtostr"
     This function returns a string describing what happened. if an error has
@@ -111,6 +125,17 @@ SUBROUTINES/METHODS
     on error).
 
     Use "errtostr" instead.
+
+  WARNINGS
+   "warnings()"
+    Returns an array ref to any warnings raised.
+
+    Example:
+
+        my @warnings = @{ File::BSED::warnings() };
+        for my $warning (@warnings) {
+            warn "Warning: $warning\n";
+        }
 
 DIAGNOSTICS
 CONFIGURATION AND ENVIRONMENT

@@ -1,5 +1,15 @@
 Revision history for Perl extension File-BSED.
 
+0.6  Tue Jul 17 17:23:02 2007
+    - uses new version of libgbsed (0.6)
+      this means that now the output file will preserve the executable flags
+      from the input file.
+    - fixed a broken preprocessor directive when PERL_MALLOC was active
+      in libgbsed.h
+    - removed unused function _hexstr2bin from BSED.xs
+    - tried to use goto() for some of the aliases in lib/File/BSED.pm, but
+      this obviosly didn't work very well. Reset to function calls instead.
+
 0.5  Sun Jul 15 22:38:45 2007
     - uses new version of libgbsed.
 

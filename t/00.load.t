@@ -44,8 +44,8 @@ is( File::BSED::string_to_hexstring('ask'), '61736b',
 
 my $ret1 = binary_file_matches('0xff', $test_binary);
 is ($ret1,  743, 'Binary_file_matches');
-ok(!File::BSED->errno,           'File::BSED->errno');
-is( File::BSED->errtostr, undef, 'File::BSED->errtostr');
+ok(!File::BSED->errno(),          'File::BSED->errno');
+is( File::BSED->errtostr(), undef, 'File::BSED->errtostr');
 
 my $tempfile = tmpnam();
 
@@ -71,7 +71,7 @@ SKIP: {
     });
 
     is( $matches, 743, 'gbsed({ ... })');
-    ok(!File::BSED->errno,              'File::BSED->errno'     );
+    ok(!File::BSED->errno(),              'File::BSED->errno'     );
     is( File::BSED->errtostr, undef,    'File::BSED->errtostr'  );
 
     unlink $tempfile;
