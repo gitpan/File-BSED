@@ -1,14 +1,26 @@
+/*
+v
+v
+v BSED.xs  - Perl-binding to libgbsed
+v
+v (c) Copyright 2007 Ask Solem <ask@0x61736b.net>
+v
+v   
+*/
 
+/*
+* $Id: BSED.xs,v 1.9 2007/07/17 15:26:35 ask Exp $
+* $Source: /opt/CVS/File-BSED/BSED.xs,v $
+* $Author: ask $
+* $HeadURL$
+* $Revision: 1.9 $
+* $Date: 2007/07/17 15:26:35 $
+*/
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
 
 #include "ppport.h"
-
-#include <stdio.h>
-
-#define PERL_MALLOC         1
-#define LIBBGSED_PRIVATE    1
 
 #include "libgbsed.h"
 
@@ -19,20 +31,7 @@ extern int gbsed_warn_index;
 MODULE = File::BSED		PACKAGE = File::BSED
 PROTOTYPES: DISABLE
 
-# $Id: BSED.xs,v 1.9 2007/07/17 15:26:35 ask Exp $
-# $Source: /opt/CVS/File-BSED/BSED.xs,v $
-# $Author: ask $
-# $HeadURL$
-# $Revision: 1.9 $
-# $Date: 2007/07/17 15:26:35 $
 
-#
-#
-#BSED.xs  - Perl-binding to libgbsed
-#
-#(c) Copyright 2007 Ask Solem <ask@0x61736b.net>
-#
-#   
 
 void
 _grow (scalar, new_size)
@@ -40,33 +39,11 @@ _grow (scalar, new_size)
     STRLEN new_size;
 
     CODE:
-    /* allocate more memory for scalar */
+        /* allocate more memory for scalar */
         SV *orig = (SV*)SvRV(scalar);
         SvUPGRADE(orig, SVt_PV);
         SvPOK_only(orig);
         SvGROW(orig, new_size);
-
-SV *
-_t()
-    CODE:
-        SV *temp = get_sv("main::TEX", FALSE);
-
-        if (temp == NULL)
-            temp  = &PL_sv_undef;
-        
-        STRLEN  cur;
-        if (SvPOK(temp)) {
-            cur = SvCUR(temp);
-            printf("CUR: [%d]\n", cur);
-        }
-        
-        STRLEN  len;
-        char   *ptr;
-        ptr       = SvPV(temp, len);
-        fprintf(stderr, "DATA: [%s], LEN: [%d]\n", ptr, len);
-        RETVAL = temp;
-    OUTPUT:
-    RETVAL
 
 char *
 _string_to_hexstring(orig)
@@ -123,9 +100,7 @@ _binary_file_matches (search, infile)
     CODE:
         int matches;
         GBSEDargs *gbsedargs;
-        gbsedargs = (GBSEDargs *)Newxz(
-            gbsedargs, 1, GBSEDargs
-        );
+        gbsedargs = _gbsed_alloc(gbsedargs, 1, GBSEDargs);
             
         gbsedargs->search       = search;
         gbsedargs->infilename   = infile;
@@ -134,7 +109,7 @@ _binary_file_matches (search, infile)
 
         RETVAL = gbsed_binary_search_replace(gbsedargs);
 
-        Safefree(gbsedargs);
+        _gbsed_safefree(gbsedargs);
 
     OUTPUT:
     RETVAL
@@ -150,9 +125,7 @@ _gbsed (search, replace, infile, outfile, min, max)
 
     CODE:
         GBSEDargs *gbsedargs;
-        gbsedargs = (GBSEDargs *)Newxz(
-            gbsedargs, 1, GBSEDargs
-        );
+        gbsedargs = _gbsed_alloc(gbsedargs, 1, GBSEDargs);
         gbsedargs->search      = search;
         gbsedargs->replace     = replace;
         gbsedargs->infilename  = infile;
@@ -162,7 +135,7 @@ _gbsed (search, replace, infile, outfile, min, max)
 
         RETVAL = gbsed_binary_search_replace(gbsedargs);
 
-        Safefree(gbsedargs);
+        _gbsed_safefree(gbsedargs);
 
     OUTPUT:
     RETVAL

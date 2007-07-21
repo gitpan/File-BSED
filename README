@@ -2,7 +2,7 @@ NAME
     File::BSED - Search/Replace in Binary Files.
 
 VERSION
-    This document describes File::BSED version 0.6
+    This document describes File::BSED version 0.66
 
 SYNOPSIS
         use File::BSED qw(binary_search_replace binary_file_matches);

@@ -12,7 +12,7 @@ use Exporter;
 use Carp qw(croak);
 use vars qw($VERSION @EXPORT_OK @ISA);
 
-$VERSION   = 0.6;
+$VERSION   = 0.66;
 
 @EXPORT_OK = qw(
     gbsed
@@ -89,7 +89,7 @@ File::BSED - Search/Replace in Binary Files.
 
 =head1 VERSION
 
-This document describes File::BSED version 0.6
+This document describes File::BSED version 0.66
 
 =head1 SYNOPSIS
 

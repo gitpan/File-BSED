@@ -1,6 +1,6 @@
 ---
 name: File-BSED
-version: 0.6
+version: 0.66
 author:
   - 'Ask Solem <ASKSH@cpan.org>'
 abstract: Search/Replace in Binary Files.
@@ -18,7 +18,7 @@ dynamic_config: 1
 provides:
   File::BSED:
     file: lib/File/BSED.pm
-    version: 0.6
+    version: 0.66
 generated_by: Module::Build version 0.2808
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.2.html
