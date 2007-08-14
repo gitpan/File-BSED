@@ -21,3 +21,7 @@ wildcards
 xfeedface
 0xfeedface
 feedface
+c
+C
+LICENCE
+libgbsed.h

@@ -29,6 +29,15 @@ my @STOPWORD_FILES = qw(
     stopwords-asksh.txt
 );
 
+if ($ENV{TEST_COVERAGE}) {
+    plan( skip_all => 'Disabled when testing coverage.' );
+}
+
+if ( not $ENV{FILEBSED_AUTHOR} ) {
+    my $msg = 'Author test.  Set $ENV{FILEBSED_AUTHOR} to a true value to run.';
+    plan( skip_all => $msg );
+}
+
 # ### Try to find the 'spell' program.
 
 REQUIREDMODULE:

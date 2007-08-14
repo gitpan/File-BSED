@@ -1,5 +1,8 @@
 Revision history for Perl extension File-BSED.
 
+0.67 Tue Aug 14 16:19:34 2007
+    - Now skips author tests. Author test modules removed from dependencies.
+
 0.6  Tue Jul 17 17:23:02 2007
     - uses new version of libgbsed (0.6)
       this means that now the output file will preserve the executable flags
